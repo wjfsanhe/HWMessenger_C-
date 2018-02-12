@@ -11,21 +11,23 @@
 #include <stdint.h>
 #include <sys/types.h>
 #include <utils/Log.h>
-#include "HWMessenger.h"
+#include <utils/String16.h>
+
 
 namespace android {
-
+class HWMessenger;
 class HWUpdator : public AHandler {
 public:
 enum {
     kWhatUpdate = 100,
 };
-    HWUpdator(HWMessenger *hwMessenger);
-    void update(int32_t keyCode, int32_t keyValue, int32_t keyFlags);
+    HWUpdator(sp<HWMessenger> hwMessenger);
+    void update(AString deviceName, int32_t keyCode, int32_t keyValue, int32_t keyFlags);
 
 protected:
     virtual ~HWUpdator();
     virtual void onMessageReceived(const sp<AMessage> &msg);
+    virtual void onFirstRef();
 private:
     sp<ALooper> mLooper;
     sp<HWMessenger> mHWMessenger;

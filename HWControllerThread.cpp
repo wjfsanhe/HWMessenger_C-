@@ -3,11 +3,12 @@
 //
 
 #include "HWControllerThread.h"
-
+#include "IHWMessengerCallback.h"
+#include "HWMessenger.h"
 
 namespace android {
 
-HWControllerThread::HWControllerThread(sp<HWMessenger> hwMessenger)
+HWControllerThread::HWControllerThread()
 {
 }
 
@@ -78,6 +79,16 @@ status_t HWControllerThread::stop()
     mLooper->unregisterHandler(id());
     mLooper->stop();
     mLooper.clear();
+    return NO_ERROR;
+}
+status_t HWControllerThread::setCallback(sp<IHWMessengerCallback> back)
+{
+    curback = back;
+    return NO_ERROR;
+}
+status_t HWControllerThread::update()
+{
+    curback->onKey(String16("AAA"), 0x68, 0x77, 0x88);
     return NO_ERROR;
 }
 status_t HWControllerThread::readSysfs(const AString &path, AString *value)

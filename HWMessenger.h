@@ -24,13 +24,14 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#include "IHWMessenger.h"
 #include <cutils/compiler.h>
 #include <utils/String8.h>
 #include <utils/String16.h>
 #include <utils/StrongPointer.h>
+#include <media/stagefright/foundation/AString.h>
 #include <media/stagefright/foundation/AHandler.h>
-
+#include <media/stagefright/foundation/AMessage.h>
+#include "IHWMessenger.h"
 
 
 namespace android {
@@ -39,9 +40,13 @@ class HWUpdator;
 class HWMonitor;
 class IHWControllerClient;
 
+
 class HWMessenger : public BnHWMessenger
 {
 public:
+    enum {
+        kWhatUpdate = 100,
+    };
     static char const* getServiceName() ANDROID_API {
         return "HWMessenger";
     }
@@ -49,12 +54,15 @@ public:
     HWMessenger() ANDROID_API;
 
     virtual status_t dump(int fd, const Vector<String16>& args);
-    virtual void updateKey(int keyCode, int value, int flags);
+    virtual void updateKey(AString deviceName, int keyCode, int value, int flags);
+    void update(AString deviceName, int32_t keyCode, int32_t keyValue, int32_t keyFlags);
 
 private:
     virtual ~HWMessenger();
     void dumpInternal(String8& result);
 protected:
+    virtual status_t registerCallback(const sp<IBinder> binder);
+    virtual status_t unregisterCallback(const sp<IBinder> binder);
     virtual sp<IHWControllerClient> createHWControllerClient();
     virtual void onFirstRef();
 private:

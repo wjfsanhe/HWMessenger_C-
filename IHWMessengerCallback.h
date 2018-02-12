@@ -37,7 +37,7 @@ class IHWMessengerCallback : public IInterface
 public:
     DECLARE_META_INTERFACE(HWMessengerCallback)
 public:
-    virtual void onKey(int keyCode, int value, int flags)=0;
+    virtual void onKey(String16 deviceName, int keyCode, int value, int flags)=0;
 };
 
 

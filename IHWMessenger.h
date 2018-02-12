@@ -19,13 +19,17 @@
 
 #include <stdint.h>
 #include <sys/types.h>
-#include "IHWMessengerCallback.h"
 #include <binder/IInterface.h>
+#include "IHWMessengerCallback.h"
+#include "IHWControllerClient.h"
+#include "HWControllerThread.h"
+#include <media/stagefright/foundation/AString.h>
 
 namespace android {
 
 
-class IHWControllerClient;
+//class IHWControllerClient;
+//class IHWMessengerCallback;
 /*
  * This class defines the Binder IPC interface for accessing various
  * InputFlinger features.
@@ -42,6 +46,7 @@ public:
 class BnHWMessenger : public BnInterface<IHWMessenger>
 {
 public:
+    BnHWMessenger(){controller = new HWControllerThread();};
     enum {
         REGISTER_CALLBACK = IBinder::FIRST_CALL_TRANSACTION,
         UNREGISTER_CALLBACK = IBinder::FIRST_CALL_TRANSACTION + 1,
@@ -50,13 +55,16 @@ public:
 
     virtual status_t onTransact(uint32_t code, const Parcel& data,
             Parcel* reply, uint32_t flags = 0);
+    virtual void updateKey(AString deviceName, int keyCode, int value, int flags) = 0;
 
 protected:
     //we support multi client.
     Vector<sp<IHWMessengerCallback>> mCallbacks;
+    sp<IHWMessengerCallback>  curback;
+    sp<HWControllerThread> controller;
     const uint64_t MAX_CLIENT_SIZE = 3;
-    virtual status_t registerCallback(const sp<IBinder> binder);
-    virtual status_t unregisterCallback(const sp<IBinder> binder);
+    virtual status_t registerCallback(const sp<IBinder> binder) = 0;
+    virtual status_t unregisterCallback(const sp<IBinder> binder) = 0;
     virtual sp<IHWControllerClient> createHWControllerClient() = 0;
 };
 

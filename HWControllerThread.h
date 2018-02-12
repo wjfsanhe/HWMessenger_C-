@@ -13,27 +13,33 @@
 #include <stdint.h>
 #include <sys/types.h>
 #include <utils/Log.h>
-#include "HWMessenger.h"
+//#include "IHWMessengerCallback.h"
+//#include "HWMessenger.h"
 
 namespace android {
 
+class IHWMessengerCallback;
+class HWMessenger;
 class HWControllerThread : public AHandler {
 public:
 enum {
-    kWhatWriteSysfs = 'WRITE',
-    kWhatReadSysfs = 'READ',
+    kWhatWriteSysfs = 101,
+    kWhatReadSysfs = 102,
 };
-    HWControllerThread(sp<HWMessenger> hwMessenger);
+    HWControllerThread();
     status_t start();
     status_t stop();
     status_t readSysfs(const AString &path, AString *value);
     status_t writeSysfs(const AString &path, const AString &setValue, AString *retValue);
+    status_t setCallback(sp<IHWMessengerCallback> back);
+    status_t update();
 
 protected:
     virtual ~HWControllerThread();
     virtual void onMessageReceived(const sp<AMessage> &msg);
 private:
     sp<ALooper> mLooper;
+    sp<IHWMessengerCallback>  curback;
 };
 
 }

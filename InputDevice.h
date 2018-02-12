@@ -8,10 +8,12 @@
 #include <utils/RefBase.h>
 #include <utils/String8.h>
 
+
 namespace android {
+class HWUpdator;
 class InputDevice : public RefBase {
 public:
-    InputDevice(){};
+    InputDevice(const sp<HWUpdator> &hwUpdator );
     void init();
     void monitor();
 private:
@@ -21,7 +23,9 @@ protected:
     ~InputDevice();
 private:
     int32_t mEpollFD;
+    bool mInitOK;
     std::map<int, char*> mfdMap;
+    sp<HWUpdator> mUpdator;
 
 };
 

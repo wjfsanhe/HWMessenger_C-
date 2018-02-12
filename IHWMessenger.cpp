@@ -17,7 +17,7 @@
  * Date  : 2018/02/05
  *
  */
- #define ATRACE_TAG "HWMessenger"
+#define LOG_TAG "HWMessenger"
 
 #include <stdint.h>
 #include <sys/types.h>
@@ -28,6 +28,7 @@
 #include <cutils/log.h>
 
 #include "IHWMessenger.h"
+
 
 namespace android {
 
@@ -72,35 +73,17 @@ status_t BnHWMessenger::onTransact(
         reply->writeInt32(err);
         break;
     }
+    case CREATE_HW_CONTROLLER_CLIENT: {
+        CHECK_INTERFACE(IHWMessenger, data, reply);
+        sp<IBinder> client = IInterface::asBinder(createHWControllerClient());
+        reply->writeStrongBinder(client);
+        break;
+    }
     default:
         return BBinder::onTransact(code, data, reply, flags);
     }
     return NO_ERROR;
 }
-status_t BnHWMessenger::registerCallback(const sp<IBinder> binder) {
-    if (binder != nullptr) {
-        if (mCallbacks.size() > MAX_CLIENT_SIZE){
-            ALOGE("Error , client beyond MAX_CLIENT_SIZE (%ld)!", MAX_CLIENT_SIZE);
-        } else {
-            ALOGD("add one client !");
-            mCallbacks.push_back(IHWMessengerCallback::asInterface(binder));
-        }
-    }
-    return BAD_INDEX;
 
-}
-status_t BnHWMessenger::unregisterCallback(const sp<IBinder> binder) {
-    if (binder != nullptr) {
-       int size = mCallbacks.size();
-       sp<IHWMessengerCallback> callback = IHWMessengerCallback::asInterface(binder);
-       for (int i = 0; i < size; i++) {
-            if( mCallbacks[i] == callback) {
-                ALOGD("remove one client !");
-                mCallbacks.removeAt(i);
-            }
-       }
-    }
-    return NO_ERROR;
-}
 
 };

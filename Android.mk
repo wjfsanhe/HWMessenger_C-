@@ -31,7 +31,8 @@ LOCAL_SRC_FILES:= \
 	IHWControllerClient.cpp \
 	HWUpdator.cpp \
 	InputDevice.cpp \
-	HWMonitor.cpp
+	HWMonitor.cpp \
+	HWControllerThread.cpp
 
 
 LOCAL_SHARED_LIBRARIES := \

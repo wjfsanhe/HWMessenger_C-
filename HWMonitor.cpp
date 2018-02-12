@@ -13,7 +13,7 @@ HWMonitor::HWMonitor(const sp<HWUpdator> &hwUpdator)
 }
 void HWMonitor::onFirstRef()
 {
-    mInputDevice = new InputDevice();
+    mInputDevice = new InputDevice(mHWUpdator);
     run("HWMonitor",ANDROID_PRIORITY_DISPLAY);
 }
 bool HWMonitor::threadLoop(){
@@ -21,9 +21,7 @@ bool HWMonitor::threadLoop(){
     //initialize read op.
     mInputDevice->init();
     while (true) {
-        //1. read key.
-
-        //2. update key state.
+        mInputDevice->monitor();
     }
     return false;
 }
