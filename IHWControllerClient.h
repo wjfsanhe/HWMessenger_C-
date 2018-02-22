@@ -28,8 +28,8 @@ class BnHWControllerClient : public BnInterface<IHWControllerClient>
 {
 public:
     enum {
-        WRITE_SYSFS = IBinder::FIRST_CALL_TRANSACTION,
-        READ_SYSFS = IBinder::FIRST_CALL_TRANSACTION + 1,
+        READ_SYSFS = IBinder::FIRST_CALL_TRANSACTION,
+        WRITE_SYSFS = IBinder::FIRST_CALL_TRANSACTION + 1,
     };
 
     virtual status_t onTransact(uint32_t code, const Parcel& data,

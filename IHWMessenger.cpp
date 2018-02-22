@@ -75,6 +75,7 @@ status_t BnHWMessenger::onTransact(
     }
     case CREATE_HW_CONTROLLER_CLIENT: {
         CHECK_INTERFACE(IHWMessenger, data, reply);
+        ALOGI("[BnHWMessenger] -->CREATE_HW_CONTROLLER_CLIENT");
         sp<IBinder> client = IInterface::asBinder(createHWControllerClient());
         reply->writeStrongBinder(client);
         break;

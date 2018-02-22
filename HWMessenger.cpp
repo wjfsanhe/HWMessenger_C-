@@ -81,9 +81,6 @@ status_t HWMessenger::registerCallback(const sp<IBinder> binder) {
         } else {
             ALOGD("add one client !");
             mCallbacks.push_back(IHWMessengerCallback::asInterface(binder));
-            curback = IHWMessengerCallback::asInterface(binder);
-            curback->onKey(String16("AAA"), 0x68, 0x77, 0x88);
-            controller->setCallback(curback);
         }
     }
     return BAD_INDEX;
@@ -107,7 +104,6 @@ status_t HWMessenger::unregisterCallback(const sp<IBinder> binder) {
 void HWMessenger::updateKey(AString deviceName, int keyCode, int value, int flags)
 {
     int size = mCallbacks.size();
-    curback->onKey(String16(deviceName.c_str()), keyCode, value, flags);
     for (int i = 0; i < size; i++) {
         sp<IHWMessengerCallback> callback = mCallbacks[i];
         ALOGI("send key to callback[%d]:[%s] %04x ", i, deviceName.c_str(), keyCode);
@@ -117,6 +113,7 @@ void HWMessenger::updateKey(AString deviceName, int keyCode, int value, int flag
 sp<IHWControllerClient> HWMessenger::createHWControllerClient()
 {
     sp<IHWControllerClient> bclient;
+    ALOGI("[HWMessenger] --- createHWControllerClient");
     sp<BnHWControllerClient> client(new BnHWControllerClient());
     bclient = client;
     return bclient;

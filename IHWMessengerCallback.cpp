@@ -29,12 +29,12 @@ public:
                 binder::Status status;
                 status.readFromParcel(data);
                 int32_t err = reply.readExceptionCode();
-                ALOGD("onkey return %s, error[%d]\n",status.toString8().string(), err);
+                //ALOGD("onkey return %s, error[%d]\n",status.toString8().string(), err);
                 if(err<0){
                         ALOGD("onkey return %d\n",err);
                         return;
                 }
-                ALOGD("onkey Bp side called\n");
+                //ALOGD("onkey Bp side called\n");
         }
 };
 IMPLEMENT_META_INTERFACE(HWMessengerCallback, "com.qiyi.hwmessenger.IHWMessengerCallback")

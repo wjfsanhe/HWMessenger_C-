@@ -46,7 +46,7 @@ public:
 class BnHWMessenger : public BnInterface<IHWMessenger>
 {
 public:
-    BnHWMessenger(){controller = new HWControllerThread();};
+    BnHWMessenger(){};
     enum {
         REGISTER_CALLBACK = IBinder::FIRST_CALL_TRANSACTION,
         UNREGISTER_CALLBACK = IBinder::FIRST_CALL_TRANSACTION + 1,
@@ -60,8 +60,6 @@ public:
 protected:
     //we support multi client.
     Vector<sp<IHWMessengerCallback>> mCallbacks;
-    sp<IHWMessengerCallback>  curback;
-    sp<HWControllerThread> controller;
     const uint64_t MAX_CLIENT_SIZE = 3;
     virtual status_t registerCallback(const sp<IBinder> binder) = 0;
     virtual status_t unregisterCallback(const sp<IBinder> binder) = 0;
