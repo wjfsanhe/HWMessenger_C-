@@ -1,11 +1,14 @@
 //author : Jianfeng
 //date   : 2018/02/05
+
+#define LOG_TAG "HWMessenger"
+
 #include <binder/Parcel.h>
 #include <binder/Status.h>
 #include <utils/Log.h>
 #include "IHWMessengerCallback.h"
 
-#define LOG_TAG "HWMessenger"
+
 
 namespace android {
 enum {

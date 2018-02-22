@@ -30,6 +30,8 @@ public:
     enum {
         READ_SYSFS = IBinder::FIRST_CALL_TRANSACTION,
         WRITE_SYSFS = IBinder::FIRST_CALL_TRANSACTION + 1,
+        GET_PROPERTY = IBinder::FIRST_CALL_TRANSACTION + 2,
+        SET_PROPERTY = IBinder::FIRST_CALL_TRANSACTION + 3,
     };
 
     virtual status_t onTransact(uint32_t code, const Parcel& data,
@@ -39,6 +41,8 @@ protected:
     //we support multi client.
     virtual String16 readSysfs(const String16 &path);
     virtual String16 writeSysfs(const String16 &path, const String16 &setValue);
+    virtual String16 getProperty(const String16 &prop);
+    virtual String16 setProperty(const String16 &prop, const String16 &setValue);
 
 };
 

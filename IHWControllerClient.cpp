@@ -10,8 +10,11 @@
 #include <binder/IPCThreadState.h>
 #include <binder/IServiceManager.h>
 #include <cutils/log.h>
+#include <cutils/properties.h>
 
 #include "IHWControllerClient.h"
+
+//todo permission check
 
 namespace android {
 
@@ -58,6 +61,21 @@ status_t BnHWControllerClient::onTransact(
         reply->writeString16(readSysfs(path));
         break;
     }
+    case SET_PROPERTY: {
+        CHECK_INTERFACE(IHWControllerClient, data, reply);
+        String16 prop = data.readString16();
+        String16 value = data.readString16();
+        reply->writeNoException();
+        reply->writeString16(setProperty(prop, value));
+        break;
+    }
+    case GET_PROPERTY: {
+        CHECK_INTERFACE(IHWControllerClient, data, reply);
+        String16 prop = data.readString16();
+        reply->writeNoException();
+        reply->writeString16(getProperty(prop));
+        break;
+    }
     default:
         return BBinder::onTransact(code, data, reply, flags);
     }
@@ -66,8 +84,22 @@ status_t BnHWControllerClient::onTransact(
 static inline const char* getChars(const String16 str) {
     return String8(str).string();
 }
+String16 BnHWControllerClient::getProperty(const String16 &prop) {
+    ALOGI("getProperty  be called [%s]",getChars(prop));
+
+    char val[PROPERTY_VALUE_MAX];
+    property_get(getChars(prop), val,"no_value");
+    return String16(val);
+
+}
+String16 BnHWControllerClient::setProperty(const String16 &prop, const String16 &setValue) {
+    ALOGI("setProperty  be called [%s --- %s]", getChars(prop), getChars(setValue));
+
+    property_set(getChars(prop), getChars(setValue));
+    return getProperty(prop);
+
+}
 String16 BnHWControllerClient::readSysfs(const String16 &path) {
-    //todo readSysfs.
     ALOGI("readSys  be called [%s]",getChars(path));
     int fd = open(getChars(path), O_RDONLY);
     if(fd < 0) {
@@ -85,7 +117,6 @@ String16 BnHWControllerClient::readSysfs(const String16 &path) {
 }
 String16 BnHWControllerClient::writeSysfs(const String16 &path, const String16 &setValue)
 {
-    //todo writeSysfs.
     ALOGI("writeSys  be called [%s -- %s]",getChars(path),getChars(setValue));
     int fd = open(getChars(path), O_RDWR);
     if(fd < 0) {
