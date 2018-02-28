@@ -23,7 +23,7 @@
 
 #include <stdint.h>
 #include <sys/types.h>
-
+#include <map>
 #include <cutils/compiler.h>
 #include <utils/String8.h>
 #include <utils/String16.h>
@@ -41,7 +41,7 @@ class HWMonitor;
 class IHWControllerClient;
 
 
-class HWMessenger : public BnHWMessenger
+class HWMessenger : public BnHWMessenger, public IBinder::DeathRecipient
 {
 public:
     enum {
@@ -61,9 +61,12 @@ private:
     virtual ~HWMessenger();
     void dumpInternal(String8& result);
 protected:
+    //Vector<sp<IHWMessengerCallback>> mCallbacks;
+    std::map<long, sp<IHWMessengerCallback>> mCallbackMap;
     virtual status_t registerCallback(const sp<IBinder> binder);
     virtual status_t unregisterCallback(const sp<IBinder> binder);
     virtual sp<IHWControllerClient> createHWControllerClient();
+    virtual void binderDied(const wp<IBinder>& who);
     virtual void onFirstRef();
 private:
     sp<HWUpdator> mUpdator;

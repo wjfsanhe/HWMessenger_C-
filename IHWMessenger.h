@@ -59,8 +59,7 @@ public:
 
 protected:
     //we support multi client.
-    Vector<sp<IHWMessengerCallback>> mCallbacks;
-    const uint64_t MAX_CLIENT_SIZE = 3;
+    const uint64_t MAX_CLIENT_SIZE = 2;
     virtual status_t registerCallback(const sp<IBinder> binder) = 0;
     virtual status_t unregisterCallback(const sp<IBinder> binder) = 0;
     virtual sp<IHWControllerClient> createHWControllerClient() = 0;

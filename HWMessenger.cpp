@@ -37,7 +37,7 @@
 
 
 namespace android {
-
+using namespace std;
 const String16 sAccessHWMessengerPermission("android.permission.ACCESS_HW_MESSENGER");
 const String16 sDumpPermission("android.permission.DUMP");
 
@@ -72,15 +72,34 @@ status_t HWMessenger::dump(int fd, const Vector<String16>& args) {
 }
 
 void HWMessenger::dumpInternal(String8& result) {
+    IPCThreadState* ipc = IPCThreadState::self();
+    int pid = ipc->getCallingPid();
+    const int uid = ipc->getCallingUid();
+    ALOGD("pid = %d, uid = %d", pid, uid);
     result.append("HW MESSENGER (dumpsys HWMessenger)\n");
 }
+
+void HWMessenger::binderDied(const wp<IBinder>& binder)
+{
+      // woah, callback died!
+      ALOGD("detect one callback died.bw[%p]-bs[%p]", binder.unsafe_get(), binder.promote().get());
+      unregisterCallback(binder.promote());
+
+}
 status_t HWMessenger::registerCallback(const sp<IBinder> binder) {
+
     if (binder != nullptr) {
-        if (mCallbacks.size() > MAX_CLIENT_SIZE){
+        if (mCallbackMap.size() > MAX_CLIENT_SIZE){
             ALOGE("Error , client beyond MAX_CLIENT_SIZE (%ld)!", MAX_CLIENT_SIZE);
         } else {
-            ALOGD("add one client !");
-            mCallbacks.push_back(IHWMessengerCallback::asInterface(binder));
+            sp<IHWMessengerCallback> callback = IHWMessengerCallback::asInterface(binder);
+            //1
+            //mCallbacks.push_back(callback);
+            //2
+            mCallbackMap.insert(std::make_pair((long)binder.get(),callback));
+
+            ALOGD("add one client [%zu]! c[%p]-b[%p]", mCallbackMap.size(), callback.get(),binder.get());
+            binder->linkToDeath(this);
         }
     }
     return BAD_INDEX;
@@ -88,14 +107,23 @@ status_t HWMessenger::registerCallback(const sp<IBinder> binder) {
 }
 status_t HWMessenger::unregisterCallback(const sp<IBinder> binder) {
     if (binder != nullptr) {
-       int size = mCallbacks.size();
+       int size = mCallbackMap.size();
        sp<IHWMessengerCallback> callback = IHWMessengerCallback::asInterface(binder);
+       ALOGD("want to unregister c[%p]-b[%p] --- size[%d]", callback.get(), binder.get(), size);
+       if (mCallbackMap.count((long)binder.get())) {
+            ALOGD("remove one client [%p]", binder.get());
+            mCallbackMap.erase((long)binder.get());
+       }
+
+#if 0
        for (int i = 0; i < size; i++) {
-            if( mCallbacks[i] == callback) {
+            ALOGD("try [%d] : m[%p] vs [%p]", i, mCallbacks[i].get(), callback.get());
+            if( mCallbacks[i].get() == callback.get()) {
                 ALOGD("remove one client !");
                 mCallbacks.removeAt(i);
             }
        }
+#endif
     }
     return NO_ERROR;
 }
@@ -103,12 +131,19 @@ status_t HWMessenger::unregisterCallback(const sp<IBinder> binder) {
 
 void HWMessenger::updateKey(AString deviceName, int keyCode, int value, int flags)
 {
+#if 0
     int size = mCallbacks.size();
     for (int i = 0; i < size; i++) {
         sp<IHWMessengerCallback> callback = mCallbacks[i];
         ALOGI("send key to callback[%d]:[%s] %04x ", i, deviceName.c_str(), keyCode);
         callback->onKey(String16(deviceName.c_str()), keyCode, value, flags);
     }
+#endif
+    std::map<long, sp<IHWMessengerCallback>>::iterator it;
+    for (it = mCallbackMap.begin(); it != mCallbackMap.end(); ++it) {
+        it->second->onKey(String16(deviceName.c_str()), keyCode, value, flags);
+    }
+
 }
 sp<IHWControllerClient> HWMessenger::createHWControllerClient()
 {
