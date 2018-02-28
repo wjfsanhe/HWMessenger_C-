@@ -63,6 +63,7 @@ status_t BnHWMessenger::onTransact(
         CHECK_INTERFACE(IHWMessenger, data, reply);
         sp<IBinder> binder = data.readStrongBinder();
         registerCallback(binder);
+
         reply->writeInt32(0);
         break;
     }
@@ -76,6 +77,7 @@ status_t BnHWMessenger::onTransact(
     case CREATE_HW_CONTROLLER_CLIENT: {
         CHECK_INTERFACE(IHWMessenger, data, reply);
         ALOGI("[BnHWMessenger] -->CREATE_HW_CONTROLLER_CLIENT");
+		reply->writeNoException();
         sp<IBinder> client = IInterface::asBinder(createHWControllerClient());
         reply->writeStrongBinder(client);
         break;

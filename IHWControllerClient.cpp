@@ -11,7 +11,7 @@
 #include <binder/IServiceManager.h>
 #include <cutils/log.h>
 #include <cutils/properties.h>
-
+#include <errno.h>
 #include "IHWControllerClient.h"
 
 //todo permission check
@@ -103,7 +103,7 @@ String16 BnHWControllerClient::readSysfs(const String16 &path) {
     ALOGI("readSys  be called [%s]",getChars(path));
     int fd = open(getChars(path), O_RDONLY);
     if(fd < 0) {
-        ALOGI("readSys error: fd <0");
+        ALOGI("readSys error: fd <0,%s", strerror(errno));
         return String16("NO_OP");
     }
 
@@ -120,7 +120,7 @@ String16 BnHWControllerClient::writeSysfs(const String16 &path, const String16 &
     ALOGI("writeSys  be called [%s -- %s]",getChars(path),getChars(setValue));
     int fd = open(getChars(path), O_RDWR);
     if(fd < 0) {
-        ALOGI("writeSys error: fd <0");
+        ALOGI("writeSys error: fd <0, %s", strerror(errno));
         return String16("NO_OP");
     }
 

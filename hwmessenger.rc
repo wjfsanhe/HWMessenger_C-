@@ -1,5 +1,7 @@
 service hwmessenger /system/bin/hwmessenger
-    class main
+    class core
     user system
-    group input wakelock
-#    onrestart restart zygote
+    group system input
+
+on property:sys.debug.hwm=1
+    start hwmessenger
