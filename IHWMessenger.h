@@ -59,7 +59,7 @@ public:
 
 protected:
     //we support multi client.
-    const uint64_t MAX_CLIENT_SIZE = 2;
+    const uint64_t MAX_CLIENT_SIZE = 10;
     virtual status_t registerCallback(const sp<IBinder> binder) = 0;
     virtual status_t unregisterCallback(const sp<IBinder> binder) = 0;
     virtual sp<IHWControllerClient> createHWControllerClient() = 0;
